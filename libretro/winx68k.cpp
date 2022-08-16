@@ -399,8 +399,15 @@ void WinX68k_Exec(void)
 		DMA_Exec(2);
 
 		if ( clk_count>=clk_next ) {
-			//OPM_RomeoOut(Config.BufferSize*5);
-			//MIDI_DelayOut((Config.MIDIAutoDelay)?(Config.BufferSize*5):Config.MIDIDelay);
+			if (Config.MIDI_SW) {
+				/* xxx: The following 2 lines were originally
+				 * commented out, uncommenting them got midi
+				 * working.  Investigate this further and
+				 * perhaps (probably) expose the options
+				 * used here? */
+				OPM_RomeoOut(Config.BufferSize*5);
+				MIDI_DelayOut((Config.MIDIAutoDelay)?(Config.BufferSize*5):Config.MIDIDelay);
+			}
 			MFP_TimerA();
 			if ( (MFP[MFP_AER]&0x40)&&(vline==CRTC_IntLine) )
 				MFP_Int(1);

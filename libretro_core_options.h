@@ -368,6 +368,30 @@ struct retro_core_option_definition option_defs_us[] = {
       },
       "disabled"
    },
+   {
+      "px68k_midi",
+      "MIDI Output",
+      "Toggle MIDI output support.",
+      {
+         { "disabled", NULL},
+         { "enabled",  NULL},
+         { NULL,       NULL },
+      },
+      "enabled"
+   },
+   {
+      "px68k_midi_type",
+      "MIDI Ouput Module Type",
+      "Supported MIDI output modules.",
+      {
+         { "LA",       NULL },
+         { "GM",       NULL },
+         { "GS",       NULL },
+         { "XG",       NULL },
+         { NULL,       NULL },
+      },
+      "GM"
+   },
 
    { NULL, NULL, NULL, {{0}}, NULL }
 };

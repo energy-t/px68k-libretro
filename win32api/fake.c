@@ -39,6 +39,7 @@
 
 #include "windows.h"
 #include "mmsystem.h"
+#include "libretro.h"
 
 DWORD WINAPI
 FAKE_GetLastError(VOID)
@@ -61,12 +62,30 @@ midiOutUnprepareHeader(HMIDIOUT hmo, LPMIDIHDR pmh, UINT cbmh)
 WINMMAPI MMRESULT WINAPI
 midiOutShortMsg(HMIDIOUT hmo, DWORD dwMsg)
 {
+	struct retro_midi_interface *midi_iface =
+		(struct retro_midi_interface *) hmo;
+
+	if (midi_iface && midi_iface->output_enabled()) {
+		midi_iface->write(dwMsg     & 0xFF, 0);
+		midi_iface->write(dwMsg>>8  & 0xFF, 0);
+		midi_iface->write(dwMsg>>16 & 0xFF, 0);
+	}
+
 	return MMSYSERR_NOERROR;
 }
 
 WINMMAPI MMRESULT WINAPI
 midiOutLongMsg(HMIDIOUT hmo, LPMIDIHDR pmh, UINT cbmh)
 {
+	struct retro_midi_interface *midi_iface =
+		(struct retro_midi_interface *) hmo;
+
+	if (midi_iface && midi_iface->output_enabled()) {
+		int i;
+		for (i = 0; i < pmh->dwBufferLength; i++)
+			midi_iface->write(pmh->lpData[i] & 0xFF, 0);
+	}
+
 	return MMSYSERR_NOERROR;
 }
 
@@ -74,6 +93,13 @@ WINMMAPI MMRESULT WINAPI
 midiOutOpen(LPHMIDIOUT phmo, UINT uDeviceID, DWORD dwCallback,
     DWORD dwInstance, DWORD fdwOpen)
 {
+	extern struct retro_midi_interface *midi_iface;
+
+	if (midi_iface && midi_iface->output_enabled()) {
+		*phmo = midi_iface;
+		return MMSYSERR_NOERROR;
+	}
+
 	return !MMSYSERR_NOERROR;	// (¤£
 }
 

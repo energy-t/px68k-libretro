@@ -108,6 +108,8 @@ static struct disk_control_interface_t disk;
 static struct retro_disk_control_callback dskcb;
 static struct retro_disk_control_ext_callback dskcb_ext;
 
+struct retro_midi_interface *midi_iface;
+
 static void update_variables(void);
 
 static bool is_path_absolute(const char* path)
@@ -1102,6 +1104,32 @@ static void update_variables(void)
       else if (!strcmp(var.value, "enabled"))
          Config.AudioDesyncHack = 1;
    }
+
+   var.key = "px68k_midi";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "disabled"))
+         Config.MIDI_SW = 0;
+      else if (!strcmp(var.value, "enabled"))
+         Config.MIDI_SW = 1;
+   }
+
+   var.key = "px68k_midi_type";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (strcmp(var.value, "LA") == 0)
+         Config.MIDI_Type = 0;
+      else if (strcmp(var.value, "GM") == 0)
+         Config.MIDI_Type = 1;
+      else if (strcmp(var.value, "GS") == 0)
+         Config.MIDI_Type = 2;
+      else if (strcmp(var.value, "XG") == 0)
+         Config.MIDI_Type = 3;
+   }
 }
 
 /************************************
@@ -1261,6 +1289,7 @@ void retro_init(void)
 {
    struct retro_log_callback log;
    struct retro_rumble_interface rumble;
+   static struct retro_midi_interface midi;
    const char *system_dir = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
@@ -1310,6 +1339,14 @@ void retro_init(void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble) && rumble.set_rumble_state)
       rumble_cb = rumble.set_rumble_state;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_MIDI_INTERFACE, &midi))
+      midi_iface = &midi;
+   else
+      midi_iface = NULL;
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "MIDI interface %s.\n",
+             midi_iface ? "initialized" : "unavailable");
 
    libretro_supports_input_bitmasks = 0;
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
@@ -1430,6 +1467,9 @@ void retro_run(void)
 
    if (Config.PushVideoBeforeAudio)
       video_cb(videoBuffer, retrow, retroh, /*retrow*/ 800 << 1/*2*/);
+
+   if (midi_iface && midi_iface->output_enabled())
+      midi_iface->flush();
 
    audio_batch_cb((const int16_t*)soundbuf, soundbuf_size);
 
