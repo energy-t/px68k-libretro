@@ -8,13 +8,10 @@
 
 #if defined (HAVE_CYCLONE)
 extern struct Cyclone m68k;
-typedef signed int  FASTCALL C68K_INT_CALLBACK(signed int level);
-#elif defined (HAVE_MUSASHI)
-typedef signed int  FASTCALL C68K_INT_CALLBACK(signed int level);
-#endif /* HAVE_CYCLONE */ /* HAVE_MUSASHI */
+#endif
 
 	uint8_t	IRQH_IRQ[8];
-	void	*IRQH_CallBack[8];
+	DWORD	(*IRQH_CallBack[8])(uint8_t);
 
 void IRQH_Init(void)
 {
@@ -57,7 +54,7 @@ void IRQH_IRQCallBack(uint8_t irq)
 	}
 }
 
-void IRQH_Int(uint8_t irq, void* handler)
+void IRQH_Int(uint8_t irq, DWORD (*handler)(uint8_t))
 {
 	int i;
 	IRQH_IRQ[irq&7] = 1;
@@ -85,8 +82,8 @@ void IRQH_Int(uint8_t irq, void* handler)
 signed int my_irqh_callback(signed int  level)
 {
 	int i;
-	C68K_INT_CALLBACK *func = IRQH_CallBack[level&7];
-	int vect = (func)(level&7);
+	DWORD (*func)(uint8_t) = IRQH_CallBack[level&7] ? IRQH_CallBack[level&7] : &IRQH_DefaultVector;
+	DWORD vect = (*func)(level&7);
 
 	for (i=7; i>0; i--)
 	{
@@ -103,5 +100,13 @@ signed int my_irqh_callback(signed int  level)
 		}
 	}
 
+	if (vect > (((DWORD)-1) / 2)) {
+		/* XXX: C68K expects a signed int type, so do (close enough to)
+		 * the right thing here to avoid any potential signed integer
+		 * overflow.  The better alternative would be to change
+		 * any IRQH_CallBack functions to return signed int directly */
+		vect = -vect;
+		return -((signed int)vect);
+	}
 	return (signed int )vect;
 }
