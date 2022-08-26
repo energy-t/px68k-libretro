@@ -8,7 +8,7 @@
 
 #include "libretro.h"
 extern retro_input_state_t input_state_cb;
-extern DWORD libretro_supports_input_bitmasks;
+extern bool libretro_supports_input_bitmasks;
 
 uint8_t joy[2];
 uint8_t JoyKeyState;

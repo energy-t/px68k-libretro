@@ -20,8 +20,7 @@ WORD	Grp_LineBufSP_Tr[1024];
 WORD	Pal16Adr[256];			/* 16bit color パレットアドレス計算用 */
 
 /* xxx: for little endian only */
-#define GET_WORD_W8(src) (*(uint8_t *)(src) | *((uint8_t *)(src) + 1) << 8)
-
+#define GET_WORD_W8(src) ((uint16_t)(*(uint8_t *)(src)) | (uint16_t)(*((uint8_t *)(src) + 1)) << 8)
 
 /*
  *   初期化〜

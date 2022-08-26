@@ -65,7 +65,7 @@ int CHANGEAV = 0;
 int CHANGEAV_TIMING = 0; /* Separate change of geometry from change of refresh rate */
 int VID_MODE = MODE_NORM; /* what framerate we start in */
 static float FRAMERATE;
-DWORD libretro_supports_input_bitmasks = 0;
+bool libretro_supports_input_bitmasks;
 unsigned int total_usec = (unsigned int) -1;
 
 static int16_t soundbuf[1024 * 2];
@@ -1258,9 +1258,9 @@ void retro_init(void)
    if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble) && rumble.set_rumble_state)
       rumble_cb = rumble.set_rumble_state;
 
-   libretro_supports_input_bitmasks = 0;
+   libretro_supports_input_bitmasks = false;
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
-      libretro_supports_input_bitmasks = 1;
+      libretro_supports_input_bitmasks = true;
 
    disk_swap_interface_init();
 /*
@@ -1287,7 +1287,7 @@ void retro_init(void)
 void retro_deinit(void)
 {
    end_loop_retro();
-   libretro_supports_input_bitmasks = 0;
+   libretro_supports_input_bitmasks = false;
 }
 
 void retro_reset(void)

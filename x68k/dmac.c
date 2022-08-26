@@ -21,11 +21,11 @@ static int DMA_LastInt = 0;
 static int (*IsReady[4])(void) = { 0, 0, 0, 0 };
 
 #define DMAINT(ch)     if ( DMA[ch].CCR&0x08 )	{ DMA_IntCH |= (1<<ch); IRQH_Int(3, &DMA_Int); }
-#define DMAERR(ch,err) DMA[ch].CER  = err; \
-                       DMA[ch].CSR |= 0x10; \
-                       DMA[ch].CSR &= 0xf7; \
-                       DMA[ch].CCR &= 0x7f; \
-                       DMAINT(ch)
+#define DMAERR(ch,err) { DMA[ch].CER  = err; \
+                         DMA[ch].CSR |= 0x10; \
+                         DMA[ch].CSR &= 0xf7; \
+                         DMA[ch].CCR &= 0x7f; \
+                         DMAINT(ch) }
 
 
 static int DMA_DummyIsReady(void)

@@ -979,7 +979,7 @@ static void draw_str(char *cp)
 			draw_char((WORD)*s << 8);
 			s++;
 		} else {
-			wc = (WORD)(*s << 8) + *(s + 1);
+			wc = ((WORD)*s << 8) + *(s + 1);
 			draw_char(wc);
 			s += 2;
 			i++;
