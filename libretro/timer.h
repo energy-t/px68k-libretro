@@ -3,7 +3,6 @@
 
 void Timer_Init(void);
 void Timer_Reset(void);
-WORD Timer_GetCount(void);
-void Timer_SetCount(WORD);
+int Timer_GetCount(void);
 
 #endif /* _WINXL_TIMER_H */

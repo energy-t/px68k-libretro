@@ -54,18 +54,18 @@ int rfd_sock;
 char	winx68k_dir[MAX_PATH];
 char	winx68k_ini[MAX_PATH];
 
-WORD	VLINE_TOTAL = 567;
-DWORD	VLINE = 0;
-DWORD	vline = 0;
+uint16_t	VLINE_TOTAL = 567;
+uint32_t	VLINE = 0;
+uint32_t	vline = 0;
 
 uint8_t DispFrame = 0;
-static DWORD SoundSampleRate;
+static uint32_t SoundSampleRate;
 
 static int ClkUsed = 0;
 static int FrameSkipCount = 0;
 static int FrameSkipQueue = 0;
 
-static DWORD old_ram_size = 0;
+static uint32_t old_ram_size = 0;
 static int old_clkdiv = 0;
 
 #ifdef __cplusplus
@@ -93,13 +93,13 @@ void WinX68k_SCSICheck(void)
 		0x4e, 0x75,							// $fc002c "rts"
 	};
 
-	WORD *p1, *p2;
+	uint16_t *p1, *p2;
 	int scsi;
 	int i;
 
 	scsi = 0;
 	for (i = 0x30600; i < 0x30c00; i += 2) {
-		p1 = (WORD *)(&IPL[i]);
+		p1 = (uint16_t *)(&IPL[i]);
 		p2 = p1 + 1;
 		// xxx: works only for little endian guys
 		if (*p1 == 0xfc00 && *p2 == 0x0000) {
@@ -264,7 +264,7 @@ void WinX68k_Exec(void)
 	//char *test = NULL;
 	int clk_total, clkdiv, usedclk, hsync, clk_next, clk_count, clk_line=0;
 	int KeyIntCnt = 0, MouseIntCnt = 0;
-	DWORD t_start = timeGetTime(), t_end;
+	uint32_t t_start = timeGetTime(), t_end;
 
 	if(!(Memory_ReadD(0xed0008)==Config.ram_size)){
 		Memory_WriteB(0xe8e00d, 0x31);             // SRAM write permission
@@ -331,7 +331,7 @@ void WinX68k_Exec(void)
 			if ( (vline>=CRTC_VSTART)&&(vline<CRTC_VEND) )
 				VLINE = ((vline-CRTC_VSTART)*CRTC_VStep)/2;
 			else
-				VLINE = (DWORD)-1;
+				VLINE = (uint32_t)-1;
 			if ( (!(MFP[MFP_AER]&0x40))&&(vline==CRTC_IntLine) )
 				MFP_Int(1);
 			if ( MFP[MFP_AER]&0x10 ) {

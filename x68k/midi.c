@@ -50,11 +50,11 @@ uint8_t		MIDI_Vector = 0;
 uint8_t		MIDI_IntEnable = 0;
 uint8_t		MIDI_IntVect = 0;
 uint8_t		MIDI_IntFlag = 0;
-DWORD		MIDI_Buffered = 0;
+uint32_t		MIDI_Buffered = 0;
 long		MIDI_BufTimer = 3333;
 uint8_t		MIDI_R05 = 0;
-DWORD		MIDI_GTimerMax = 0;
-DWORD		MIDI_MTimerMax = 0;
+uint32_t		MIDI_GTimerMax = 0;
+uint32_t		MIDI_MTimerMax = 0;
 long		MIDI_GTimerVal = 0;
 long		MIDI_MTimerVal = 0;
 uint8_t		MIDI_TxFull = 0;
@@ -65,7 +65,7 @@ static uint8_t MIDI_ResetType[5] = {		/* Config.MIDI_Type に合わせて… */
 };
 
 typedef struct {
-	DWORD time;
+	uint32_t time;
 	uint8_t msg;
 } DELAYBUFITEM;
 
@@ -115,24 +115,24 @@ static uint8_t EXCV_XGRESET[] = { 0xf0, 0x43, 0x10, 0x4C, 0x00, 0x00, 0x7E, 0x00
 #define	MIDI_ACTIVESENSE	0xfe
 #define	MIDI_SYSTEMRESET	0xff
 
-#define MIDIOUTS(a,b,c) (((DWORD)c << 16) | ((DWORD)b << 8) | (DWORD)a)
+#define MIDIOUTS(a,b,c) (((uint32_t)c << 16) | ((uint32_t)b << 8) | (uint32_t)a)
 
 /*
  *   割り込み
  */
-DWORD FASTCALL MIDI_Int(uint8_t irq)
+uint32_t FASTCALL MIDI_Int(uint8_t irq)
 {
 	IRQH_IRQCallBack(irq);
 	if ( irq==4 )
-		return (DWORD)(MIDI_Vector|MIDI_IntVect);
-	return (DWORD)(-1);
+		return (uint32_t)(MIDI_Vector|MIDI_IntVect);
+	return (uint32_t)(-1);
 }
 
 
 /*
  *   たいまを進める
  */
-void FASTCALL MIDI_Timer(DWORD clk)
+void FASTCALL MIDI_Timer(uint32_t clk)
 {
 	if ( !Config.MIDI_SW ) return;	/* MIDI OFF時は帰る */
 
@@ -228,7 +228,7 @@ void MIDI_Waitlastexclusiveout(void)
  */
 void MIDI_Reset(void)
 {
-	DWORD msg;
+	uint32_t msg;
 
 	memset(DelayBuf, 0, sizeof(DelayBuf));
 	DBufPtrW = DBufPtrR = 0;
@@ -486,7 +486,7 @@ void MIDI_Message(uint8_t mes)
 /*
  *   I/O Read
  */
-uint8_t FASTCALL MIDI_Read(DWORD adr)
+uint8_t FASTCALL MIDI_Read(uint32_t adr)
 {
 	uint8_t ret = 0;
 
@@ -645,7 +645,7 @@ void MIDI_DelayOut(unsigned int delay)
 /*
  *   I/O Write
  */
-void FASTCALL MIDI_Write(DWORD adr, uint8_t data)
+void FASTCALL MIDI_Write(uint32_t adr, uint8_t data)
 {
 	if ( (adr<0xeafa01)||(adr>=0xeafa10)||(!Config.MIDI_SW) )	/* 変なアドレスか、 */
 	{								/* MIDI OFF時にはバスエラーにする */
@@ -686,7 +686,7 @@ void FASTCALL MIDI_Write(DWORD adr, uint8_t data)
 		case 7:
 			break;
 		case 8:
-			MIDI_GTimerMax = (MIDI_GTimerMax&0xff00)|(DWORD)data;
+			MIDI_GTimerMax = (MIDI_GTimerMax&0xff00)|(uint32_t)data;
 			break;
 		case 9:
 			break;
@@ -713,7 +713,7 @@ void FASTCALL MIDI_Write(DWORD adr, uint8_t data)
 		case 7:
 			break;
 		case 8:
-			MIDI_GTimerMax = (MIDI_GTimerMax&0xff)|(((DWORD)(data&0x3f))*256);
+			MIDI_GTimerMax = (MIDI_GTimerMax&0xff)|(((uint32_t)(data&0x3f))*256);
 			if (data&0x80)
 				MIDI_GTimerVal = MIDI_GTimerMax*80;
 			break;
@@ -746,7 +746,7 @@ void FASTCALL MIDI_Write(DWORD adr, uint8_t data)
 		case 7:
 			break;
 		case 8:
-			MIDI_MTimerMax = (MIDI_MTimerMax&0xff00)|(DWORD)data;
+			MIDI_MTimerMax = (MIDI_MTimerMax&0xff00)|(uint32_t)data;
 			break;
 		case 9:
 			break;
@@ -772,7 +772,7 @@ void FASTCALL MIDI_Write(DWORD adr, uint8_t data)
 		case 7:
 			break;
 		case 8:
-			MIDI_MTimerMax = (MIDI_MTimerMax&0xff)|(((DWORD)(data&0x3f))*256);
+			MIDI_MTimerMax = (MIDI_MTimerMax&0xff)|(((uint32_t)(data&0x3f))*256);
 			if (data&0x80)
 				MIDI_MTimerVal = MIDI_MTimerMax*80;
 			break;
@@ -840,17 +840,17 @@ static int getvalue(char **buf, int cutspace)
 
 static int file_readline(FILEH fh, char *buf, int len)
 {
-	DWORD	pos;
-	DWORD	readsize;
-	DWORD	i;
+	uint32_t	pos;
+	uint32_t	readsize;
+	uint32_t	i;
 
 	if (len < 2)
 		return(-1);
 	pos = File_Seek(fh, 0, FSEEK_CUR);
-	if (pos == (DWORD)-1)
+	if (pos == (uint32_t)-1)
 		return(-1);
 	readsize = File_Read(fh, buf, len-1);
-	if (readsize == (DWORD)-1)
+	if (readsize == (uint32_t)-1)
 		return(-1);
 	if (!readsize)
 		return(-1);

@@ -217,7 +217,7 @@ void send_keycode(uint8_t code, int flag)
 	}
 }
 
-static uint8_t get_x68k_keycode(DWORD wp)
+static uint8_t get_x68k_keycode(uint32_t wp)
 {
 	if (wp < KEYTABLE_MAX/2) {
 		return KeyTable[wp];
@@ -323,7 +323,7 @@ static uint8_t get_x68k_keycode(DWORD wp)
  *	WM_KEYDOWN¡Á
  */
 void
-Keyboard_KeyDown(DWORD wp)
+Keyboard_KeyDown(uint32_t wp)
 {
 	uint8_t newwp;
 	uint8_t code = get_x68k_keycode(wp);
@@ -380,7 +380,7 @@ Keyboard_KeyDown(DWORD wp)
  *	WM_KEYUP
  */
 void
-Keyboard_KeyUp(DWORD wp)
+Keyboard_KeyUp(uint32_t wp)
 {
 	uint8_t newwp;
 	uint8_t code = get_x68k_keycode(wp);

@@ -31,11 +31,11 @@ void Timer_Reset(void)
 	tick = timeGetUsec();
 }
 
-WORD Timer_GetCount(void)
+int Timer_GetCount(void)
 {
-	DWORD ticknow   = timeGetUsec();
-	DWORD dif       = ticknow-tick;
-	DWORD TIMEBASE  = ((CRTC_Regs[0x29]&0x10)?VSYNC_HIGH:VSYNC_NORM);
+	uint32_t ticknow   = timeGetUsec();
+	uint32_t dif       = ticknow-tick;
+	uint32_t TIMEBASE  = ((CRTC_Regs[0x29]&0x10)?VSYNC_HIGH:VSYNC_NORM);
 	timercnt       += dif*10;  /* switch from msec to usec */
 	tick = ticknow;
 	if ( timercnt>=TIMEBASE )

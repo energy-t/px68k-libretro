@@ -27,28 +27,28 @@
 
 #include "fmg_wrap.h"
 
-void AdrError(DWORD, DWORD);
-void BusError(DWORD, DWORD);
+void AdrError(uint32_t, uint32_t);
+void BusError(uint32_t, uint32_t);
 
-static void wm_main(DWORD addr, uint8_t val);
-static void wm_cnt(DWORD addr, uint8_t val);
-static void wm_buserr(DWORD addr, uint8_t val);
-static void wm_opm(DWORD addr, uint8_t val);
-static void wm_e82(DWORD addr, uint8_t val);
-static void wm_nop(DWORD addr, uint8_t val);
+static void wm_main(uint32_t addr, uint8_t val);
+static void wm_cnt(uint32_t addr, uint8_t val);
+static void wm_buserr(uint32_t addr, uint8_t val);
+static void wm_opm(uint32_t addr, uint8_t val);
+static void wm_e82(uint32_t addr, uint8_t val);
+static void wm_nop(uint32_t addr, uint8_t val);
 
-static uint8_t rm_main(DWORD addr);
-static uint8_t rm_font(DWORD addr);
-static uint8_t rm_ipl(DWORD addr);
-static uint8_t rm_nop(DWORD addr);
-static uint8_t rm_opm(DWORD addr);
-static uint8_t rm_e82(DWORD addr);
-static uint8_t rm_buserr(DWORD addr);
+static uint8_t rm_main(uint32_t addr);
+static uint8_t rm_font(uint32_t addr);
+static uint8_t rm_ipl(uint32_t addr);
+static uint8_t rm_nop(uint32_t addr);
+static uint8_t rm_opm(uint32_t addr);
+static uint8_t rm_e82(uint32_t addr);
+static uint8_t rm_buserr(uint32_t addr);
 
-void cpu_setOPbase24(DWORD addr);
+void cpu_setOPbase24(uint32_t addr);
 void Memory_ErrTrace(void);
 
-uint8_t (*MemReadTable[])(DWORD) = {
+uint8_t (*MemReadTable[])(uint32_t) = {
 	TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read,
 	TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read,
 	TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read, TVRAM_Read,
@@ -88,7 +88,7 @@ uint8_t (*MemReadTable[])(DWORD) = {
 	rm_ipl, rm_ipl, rm_ipl, rm_ipl, rm_ipl, rm_ipl, rm_ipl, rm_ipl,
 };
 
-void (*MemWriteTable[])(DWORD, uint8_t) = {
+void (*MemWriteTable[])(uint32_t, uint8_t) = {
 	TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write,
 	TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write,
 	TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write, TVRAM_Write,
@@ -134,7 +134,7 @@ static uint8_t *OP_ROM;
 uint8_t *FONT;
 
 uint32_t BusErrFlag = 0;
-DWORD BusErrHandling = 0;
+uint32_t BusErrHandling = 0;
 uint32_t BusErrAdr;
 uint32_t MemByteAccess = 0;
 
@@ -142,7 +142,7 @@ uint32_t MemByteAccess = 0;
  * write function
  */
 void 
-dma_writemem24(DWORD addr, uint8_t val)
+dma_writemem24(uint32_t addr, uint8_t val)
 {
 
 	MemByteAccess = 0;
@@ -151,7 +151,7 @@ dma_writemem24(DWORD addr, uint8_t val)
 }
 
 void 
-dma_writemem24_word(DWORD addr, WORD val)
+dma_writemem24_word(uint32_t addr, uint16_t val)
 {
 
 	MemByteAccess = 0;
@@ -166,7 +166,7 @@ dma_writemem24_word(DWORD addr, WORD val)
 }
 
 void 
-dma_writemem24_dword(DWORD addr, DWORD val)
+dma_writemem24_dword(uint32_t addr, uint32_t val)
 {
 
 	MemByteAccess = 0;
@@ -183,7 +183,7 @@ dma_writemem24_dword(DWORD addr, DWORD val)
 }
 
 void 
-cpu_writemem24(DWORD addr, DWORD val)
+cpu_writemem24(uint32_t addr, uint32_t val)
 {
 
 	MemByteAccess = 0;
@@ -197,7 +197,7 @@ cpu_writemem24(DWORD addr, DWORD val)
 }
 
 void 
-cpu_writemem24_word(DWORD addr, DWORD val)
+cpu_writemem24_word(uint32_t addr, uint32_t val)
 {
 
 	MemByteAccess = 0;
@@ -219,7 +219,7 @@ cpu_writemem24_word(DWORD addr, DWORD val)
 }
 
 void 
-cpu_writemem24_dword(DWORD addr, DWORD val)
+cpu_writemem24_dword(uint32_t addr, uint32_t val)
 {
 
 	MemByteAccess = 0;
@@ -242,13 +242,13 @@ cpu_writemem24_dword(DWORD addr, DWORD val)
 	}
 }
 
-static void wm_main(DWORD addr, uint8_t val) 
+static void wm_main(uint32_t addr, uint8_t val) 
 {
 	if ((BusErrFlag & 7) == 0)
 		wm_cnt(addr, val);
 }
 
-static void wm_cnt(DWORD addr, uint8_t val)
+static void wm_cnt(uint32_t addr, uint8_t val)
 {
 
 	addr &= 0x00ffffff;
@@ -261,7 +261,7 @@ static void wm_cnt(DWORD addr, uint8_t val)
 }
 
 static void 
-wm_buserr(DWORD addr, uint8_t val)
+wm_buserr(uint32_t addr, uint8_t val)
 {
 	BusErrFlag = 2;
 	BusErrAdr = addr;
@@ -269,7 +269,7 @@ wm_buserr(DWORD addr, uint8_t val)
 }
 
 static void 
-wm_opm(DWORD addr, uint8_t val)
+wm_opm(uint32_t addr, uint8_t val)
 {
 	uint8_t t;
 #ifdef RFMDRV
@@ -289,7 +289,7 @@ wm_opm(DWORD addr, uint8_t val)
 }
 
 static void 
-wm_e82(DWORD addr, uint8_t val)
+wm_e82(uint32_t addr, uint8_t val)
 {
 	if (addr < 0x00e82400)
 		Pal_Write(addr, val);
@@ -297,21 +297,21 @@ wm_e82(DWORD addr, uint8_t val)
 		VCtrl_Write(addr, val);
 }
 
-static void wm_nop(DWORD addr, uint8_t val) { }
+static void wm_nop(uint32_t addr, uint8_t val) { }
 
 /*
  * read function
  */
 uint8_t 
-dma_readmem24(DWORD addr)
+dma_readmem24(uint32_t addr)
 {
 	return rm_main(addr);
 }
 
-WORD 
-dma_readmem24_word(DWORD addr)
+uint16_t 
+dma_readmem24_word(uint32_t addr)
 {
-	WORD v;
+	uint16_t v;
 
 	if (addr & 1) {
 		BusErrFlag = 3;
@@ -323,10 +323,10 @@ dma_readmem24_word(DWORD addr)
 	return v;
 }
 
-DWORD 
-dma_readmem24_dword(DWORD addr)
+uint32_t 
+dma_readmem24_dword(uint32_t addr)
 {
-	DWORD v;
+	uint32_t v;
 
 	if (addr & 1) {
 		BusErrFlag = 3;
@@ -340,21 +340,21 @@ dma_readmem24_dword(DWORD addr)
 	return v;
 }
 
-DWORD 
-cpu_readmem24(DWORD addr)
+uint32_t 
+cpu_readmem24(uint32_t addr)
 {
 	uint8_t v = rm_main(addr);
 	if (BusErrFlag & 1) {
 		Memory_ErrTrace();
 		BusError(addr, 0);
 	}
-	return (DWORD) v;
+	return (uint32_t) v;
 }
 
-DWORD 
-cpu_readmem24_word(DWORD addr)
+uint32_t 
+cpu_readmem24_word(uint32_t addr)
 {
-	WORD v;
+	uint16_t v;
 
 	if (addr & 1) {
 		AdrError(addr, 0);
@@ -369,13 +369,13 @@ cpu_readmem24_word(DWORD addr)
 		Memory_ErrTrace();
 		BusError(addr, 0);
 	}
-	return (DWORD) v;
+	return (uint32_t) v;
 }
 
-DWORD 
-cpu_readmem24_dword(DWORD addr)
+uint32_t 
+cpu_readmem24_dword(uint32_t addr)
 {
-	DWORD v;
+	uint32_t v;
 
 	MemByteAccess = 0;
 
@@ -393,7 +393,7 @@ cpu_readmem24_dword(DWORD addr)
 	return v;
 }
 
-static uint8_t rm_main(DWORD addr)
+static uint8_t rm_main(uint32_t addr)
 {
 	addr &= 0x00ffffff;
 	if (addr < 0x00c00000) /* Use RAM upto 12MB */
@@ -403,30 +403,30 @@ static uint8_t rm_main(DWORD addr)
 	return MemReadTable[(addr >> 13) & 0xff](addr);
 }
 
-static uint8_t rm_font(DWORD addr)
+static uint8_t rm_font(uint32_t addr)
 {
 	return FONT[addr & 0xfffff];
 }
 
-static uint8_t rm_ipl(DWORD addr)
+static uint8_t rm_ipl(uint32_t addr)
 {
 	return IPL[(addr & 0x3ffff) ^ 1];
 }
 
-static uint8_t rm_nop(DWORD addr)
+static uint8_t rm_nop(uint32_t addr)
 {
 	(void)addr;
 	return 0;
 }
 
-static uint8_t rm_opm(DWORD addr)
+static uint8_t rm_opm(uint32_t addr)
 {
 	if ((addr & 3) == 3)
 		return OPM_Read(0);
 	return 0;
 }
 
-static uint8_t rm_e82(DWORD addr)
+static uint8_t rm_e82(uint32_t addr)
 {
 	if (addr < 0x00e82400)
 		return Pal_Read(addr);
@@ -435,7 +435,7 @@ static uint8_t rm_e82(DWORD addr)
 	return 0;
 }
 
-static uint8_t rm_buserr(DWORD addr)
+static uint8_t rm_buserr(uint32_t addr)
 {
 	BusErrFlag = 1;
 	BusErrAdr = addr;
@@ -449,16 +449,16 @@ static uint8_t rm_buserr(DWORD addr)
 void Memory_Init(void)
 {
 #if defined (HAVE_CYCLONE)
-	cpu_setOPbase24((DWORD)m68000_get_reg(M68K_PC));
+	cpu_setOPbase24((uint32_t)m68000_get_reg(M68K_PC));
 #elif defined (HAVE_C68K)
-    cpu_setOPbase24((DWORD)C68k_Get_PC(&C68K));
+    cpu_setOPbase24((uint32_t)C68k_Get_PC(&C68K));
 #elif defined (HAVE_MUSASHI)
-    cpu_setOPbase24((DWORD)m68k_get_reg(NULL, M68K_REG_PC));
+    cpu_setOPbase24((uint32_t)m68k_get_reg(NULL, M68K_REG_PC));
 #endif /* HAVE_C68K */ /* HAVE_MUSASHI */
 }
 
 void 
-cpu_setOPbase24(DWORD addr)
+cpu_setOPbase24(uint32_t addr)
 {
 	switch ((addr >> 20) & 0xf) {
 	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
@@ -508,5 +508,5 @@ Memory_SetSCSIMode(void)
 
 void Memory_ErrTrace(void) { }
 void Memory_IntErr(int i)  { }
-void AdrError(DWORD adr, DWORD unknown) { }
-void BusError(DWORD adr, DWORD unknown) { BusErrHandling = 1; }
+void AdrError(uint32_t adr, uint32_t unknown) { }
+void BusError(uint32_t adr, uint32_t unknown) { BusErrHandling = 1; }

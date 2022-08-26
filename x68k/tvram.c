@@ -45,7 +45,7 @@ void TVRAM_Init(void)
 	}
 }
 
-uint8_t FASTCALL TVRAM_Read(DWORD adr)
+uint8_t FASTCALL TVRAM_Read(uint32_t adr)
 {
 	adr &= 0x7ffff;
 	adr ^= 1;
@@ -53,7 +53,7 @@ uint8_t FASTCALL TVRAM_Read(DWORD adr)
 }
 
 
-static INLINE void TVRAM_WriteByte(DWORD adr, uint8_t data)
+static INLINE void TVRAM_WriteByte(uint32_t adr, uint8_t data)
 {
 	if (TVRAM[adr]!=data)
 	{
@@ -62,7 +62,7 @@ static INLINE void TVRAM_WriteByte(DWORD adr, uint8_t data)
 	}
 }
 
-static INLINE void TVRAM_WriteByteMask(DWORD adr, uint8_t data)
+static INLINE void TVRAM_WriteByteMask(uint32_t adr, uint8_t data)
 {
 	data = (TVRAM[adr] & CRTC_Regs[0x2e + ((adr^1) & 1)]) | (data & (~CRTC_Regs[0x2e + ((adr ^ 1) & 1)]));
 	if (TVRAM[adr] != data)
@@ -72,7 +72,7 @@ static INLINE void TVRAM_WriteByteMask(DWORD adr, uint8_t data)
 	}
 }
 
-void FASTCALL TVRAM_Write(DWORD adr, uint8_t data)
+void FASTCALL TVRAM_Write(uint32_t adr, uint8_t data)
 {
 	adr &= 0x7ffff;
 	adr ^= 1;
@@ -102,10 +102,11 @@ void FASTCALL TVRAM_Write(DWORD adr, uint8_t data)
 			TVRAM_WriteByte(adr, data);
 	}
 	{
-		DWORD *ptr = (DWORD *)TextDrawPattern;
-		DWORD tvram_addr = adr & 0x1ffff;
-		DWORD workadr = ((adr & 0x1ff80) + ((adr ^ 1) & 0x7f)) << 3;
-		DWORD t0, t1;
+		/* XXX: this doesn't look portable */
+		uint32_t *ptr = (uint32_t *)TextDrawPattern;
+		uint32_t tvram_addr = adr & 0x1ffff;
+		uint32_t workadr = ((adr & 0x1ff80) + ((adr ^ 1) & 0x7f)) << 3;
+		uint32_t t0, t1;
 		uint8_t pat;
 
 		pat = TVRAM[tvram_addr + 0x60000];
@@ -124,20 +125,20 @@ void FASTCALL TVRAM_Write(DWORD adr, uint8_t data)
 		t0 |= ptr[(pat * 2)];
 		t1 |= ptr[(pat * 2 + 1)];
 
-		*((DWORD *)&TextDrawWork[workadr]) = t0;
-		*(((DWORD *)(&TextDrawWork[workadr])) + 1) = t1;
+		*((uint32_t *)&TextDrawWork[workadr]) = t0;
+		*(((uint32_t *)(&TextDrawWork[workadr])) + 1) = t1;
 	}
 }
 
 void FASTCALL TVRAM_RCUpdate(void)
 {
-	DWORD adr = ((DWORD)CRTC_Regs[0x2d]<<9);
+	uint32_t adr = ((uint32_t)CRTC_Regs[0x2d]<<9);
 
 	/* XXX: BUG */
-	DWORD *ptr = (DWORD *)TextDrawPattern;
-	DWORD *wptr = (DWORD *)(TextDrawWork + (adr << 3));
-	DWORD t0, t1;
-	DWORD tadr;
+	uint32_t *ptr = (uint32_t *)TextDrawPattern;
+	uint32_t *wptr = (uint32_t *)(TextDrawWork + (adr << 3));
+	uint32_t t0, t1;
+	uint32_t tadr;
 	uint8_t pat;
 	int i;
 
@@ -167,12 +168,12 @@ void FASTCALL TVRAM_RCUpdate(void)
 
 void FASTCALL Text_DrawLine(int opaq)
 {
-	DWORD addr;
-	DWORD x;
-	DWORD off = 16;
-	DWORD i;
+	uint32_t addr;
+	uint32_t x;
+	uint32_t off = 16;
+	uint32_t i;
 	uint8_t t;
-	DWORD y = TextScrollY + VLINE;
+	uint32_t y = TextScrollY + VLINE;
 	if ((CRTC_Regs[0x29] & 0x1c) == 0x1c)
 		y += VLINE;
 	y = (y & 0x3ff) << 10;

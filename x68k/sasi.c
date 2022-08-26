@@ -38,11 +38,11 @@ int SASI_IsReady(void)
 /*
  *   わりこみ~
  */
-DWORD FASTCALL SASI_Int(uint8_t irq)
+uint32_t FASTCALL SASI_Int(uint8_t irq)
 {
 	IRQH_IRQCallBack(irq);
 	if (irq==1)
-		return ((DWORD)IOC_IntVect+2);
+		return ((uint32_t)IOC_IntVect+2);
 	return -1;
 }
 
@@ -117,7 +117,7 @@ error:
 /*
  *   I/O Read
  */
-uint8_t FASTCALL SASI_Read(DWORD adr)
+uint8_t FASTCALL SASI_Read(uint32_t adr)
 {
 	uint8_t ret = 0;
 	int16_t result;
@@ -244,8 +244,8 @@ void SASI_CheckCmd(void)
 		SASI_Stat = 0;
 		break;
 	case 0x08:					/* Read Data */
-		SASI_Sector = (((DWORD)SASI_Cmd[1]&0x1f)<<16)|(((DWORD)SASI_Cmd[2])<<8)|((DWORD)SASI_Cmd[3]);
-		SASI_Blocks = (DWORD)SASI_Cmd[4];
+		SASI_Sector = (((uint32_t)SASI_Cmd[1]&0x1f)<<16)|(((uint32_t)SASI_Cmd[2])<<8)|((uint32_t)SASI_Cmd[3]);
+		SASI_Blocks = (uint32_t)SASI_Cmd[4];
 		SASI_Phase++;
 		SASI_RW = 1;
 		SASI_BufPtr = 0;
@@ -255,8 +255,8 @@ void SASI_CheckCmd(void)
 			SASI_Error = 0x0f;
 		break;
 	case 0x0a:					/* Write Data */
-		SASI_Sector = (((DWORD)SASI_Cmd[1]&0x1f)<<16)|(((DWORD)SASI_Cmd[2])<<8)|((DWORD)SASI_Cmd[3]);
-		SASI_Blocks = (DWORD)SASI_Cmd[4];
+		SASI_Sector = (((uint32_t)SASI_Cmd[1]&0x1f)<<16)|(((uint32_t)SASI_Cmd[2])<<8)|((uint32_t)SASI_Cmd[3]);
+		SASI_Blocks = (uint32_t)SASI_Cmd[4];
 		SASI_Phase++;
 		SASI_RW = 0;
 		SASI_BufPtr = 0;
@@ -298,7 +298,7 @@ void SASI_CheckCmd(void)
 /*
  *   I/O Write
  */
-void FASTCALL SASI_Write(DWORD adr, uint8_t data)
+void FASTCALL SASI_Write(uint32_t adr, uint8_t data)
 {
 	int16_t result;
 	int i;

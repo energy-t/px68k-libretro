@@ -93,7 +93,7 @@ static void ADPCM_InitTable(void)
 /*
  *   MPUクロック経過分だけバッファにデータを溜めておく
  */
-void FASTCALL ADPCM_PreUpdate(DWORD clock)
+void FASTCALL ADPCM_PreUpdate(uint32_t clock)
 {
 	/*if (!ADPCM_Playing) return;*/
 	ADPCM_PreCounter += ((ADPCM_ClockRate/24)*clock);
@@ -111,7 +111,7 @@ void FASTCALL ADPCM_PreUpdate(DWORD clock)
 /*
  *   DSoundが指定してくる分だけバッファにデータを書き出す
  */
-void FASTCALL ADPCM_Update(int16_t *buffer, DWORD length, int rate, uint8_t *pbsp, uint8_t *pbep)
+void FASTCALL ADPCM_Update(int16_t *buffer, uint32_t length, int rate, uint8_t *pbsp, uint8_t *pbep)
 {
 	int outs;
 	signed int outl, outr;
@@ -248,7 +248,7 @@ static INLINE void ADPCM_WriteOne(int val)
 /*
  *   I/O Write
  */
-void FASTCALL ADPCM_Write(DWORD adr, uint8_t data)
+void FASTCALL ADPCM_Write(uint32_t adr, uint8_t data)
 {
 	if ( adr==0xe92001 ) {
 		if ( data&1 ) {
@@ -274,7 +274,7 @@ void FASTCALL ADPCM_Write(DWORD adr, uint8_t data)
 /*
  *   I/O Read（ステータスチェック）
  */
-uint8_t FASTCALL ADPCM_Read(DWORD adr)
+uint8_t FASTCALL ADPCM_Read(uint32_t adr)
 {
 	if ( adr==0xe92001 )
 		return ((ADPCM_Playing)?0xc0:0x40);
@@ -323,7 +323,7 @@ void ADPCM_SetClock(int n)
 /*
  *
  */
-void ADPCM_Init(DWORD samplerate)
+void ADPCM_Init(uint32_t samplerate)
 {
 	ADPCM_WrPtr = 0;
 	ADPCM_RdPtr = 0;

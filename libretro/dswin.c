@@ -40,7 +40,7 @@ uint8_t *pcmbufp = pcmbuffer;
 uint8_t *pbsp = pcmbuffer;
 uint8_t *pbrp = pcmbuffer, *pbwp = pcmbuffer;
 uint8_t *pbep = &pcmbuffer[PCMBUF_SIZE];
-DWORD ratebase = 22050;
+uint32_t ratebase = 22050;
 long DSound_PreCounter = 0;
 uint8_t rsndbuf[PCMBUF_SIZE];
 
@@ -51,7 +51,7 @@ void raudio_callback(void *userdata, unsigned char *stream, int len);
 int
 DSound_Init(unsigned long rate, unsigned long buflen)
 {
-	DWORD samples;
+	uint32_t samples;
 
 	if (playing)
 		return FALSE;
@@ -106,7 +106,7 @@ static void sound_send(int length)
    ADPCM_Update((int16_t *)pbwp, length, rate, pbsp, pbep);
    OPM_Update((int16_t *)pbwp, length, rate, pbsp, pbep);
 
-   pbwp += length * sizeof(WORD) * 2;
+   pbwp += length * sizeof(uint16_t) * 2;
    if (pbwp >= pbep)
       pbwp = pbsp + (pbwp - pbep);
 }

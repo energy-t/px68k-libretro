@@ -8,8 +8,8 @@ typedef struct {			/* Header Part (size:2B0h) */
 	uint8_t	reserved1[9]; 		/* Reserved */
 	uint8_t	protect;		/* Write Protect bit:4 */
 	uint8_t	fd_type;		/* Disk Format */
-	DWORD	fd_size;		/* Disk Size */
-	DWORD	trackp[164];		/* Track_pointer */
+	uint32_t	fd_size;		/* Disk Size */
+	uint32_t	trackp[164];		/* Track_pointer */
 } D88_HEADER;
 
 void D88_Init(void);

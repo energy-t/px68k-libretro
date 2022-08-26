@@ -41,9 +41,9 @@ void DMA_SetReadyCB(int ch, int (*func)(void))
 /*
  *   割り込みベクタを返す
  */
-DWORD FASTCALL DMA_Int(uint8_t irq)
+uint32_t FASTCALL DMA_Int(uint8_t irq)
 {
-	DWORD ret = 0xffffffff;
+	uint32_t ret = 0xffffffff;
 	int bit = 0;
 	int i = DMA_LastInt;
 	IRQH_IRQCallBack(irq);
@@ -52,9 +52,9 @@ DWORD FASTCALL DMA_Int(uint8_t irq)
 			bit = 1<<i;
 			if ( DMA_IntCH&bit ) {
 				if ( (DMA[i].CSR)&0x10 )
-					ret = ((DWORD)(DMA[i].EIV));
+					ret = ((uint32_t)(DMA[i].EIV));
 				else
-					ret = ((DWORD)(DMA[i].NIV));
+					ret = ((uint32_t)(DMA[i].NIV));
 				DMA_IntCH &= ~bit;
 				break;
 			}
@@ -70,7 +70,7 @@ DWORD FASTCALL DMA_Int(uint8_t irq)
 /*
  *   I/O Read
  */
-uint8_t FASTCALL DMA_Read(DWORD adr)
+uint8_t FASTCALL DMA_Read(uint32_t adr)
 {
 	unsigned char* p;
 	int off = adr&0x3f, ch = ((adr-0xe84000)>>6);
@@ -108,7 +108,7 @@ uint8_t FASTCALL DMA_Read(DWORD adr)
 /*
  *   I/O Write
  */
-void FASTCALL DMA_Write(DWORD adr, uint8_t data)
+void FASTCALL DMA_Write(uint32_t adr, uint8_t data)
 {
 	unsigned char* p;
 	int off = adr&0x3f, ch = ((adr-0xe84000)>>6);
@@ -215,7 +215,7 @@ void FASTCALL DMA_Write(DWORD adr, uint8_t data)
  */
 int FASTCALL DMA_Exec(int ch)
 {
-	DWORD *src, *dst;
+	uint32_t *src, *dst;
 
 	if ( DMA[ch].OCR&0x80 ) {		/* Device->Memory */
 		src = &DMA[ch].DAR;

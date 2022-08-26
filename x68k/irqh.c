@@ -11,14 +11,14 @@ extern struct Cyclone m68k;
 #endif
 
 	uint8_t	IRQH_IRQ[8];
-	DWORD	(*IRQH_CallBack[8])(uint8_t);
+	uint32_t	(*IRQH_CallBack[8])(uint8_t);
 
 void IRQH_Init(void)
 {
 	memset(IRQH_IRQ, 0, 8);
 }
 
-DWORD FASTCALL IRQH_DefaultVector(uint8_t irq)
+uint32_t FASTCALL IRQH_DefaultVector(uint8_t irq)
 {
 	IRQH_IRQCallBack(irq);
 	return -1;
@@ -54,7 +54,7 @@ void IRQH_IRQCallBack(uint8_t irq)
 	}
 }
 
-void IRQH_Int(uint8_t irq, DWORD (*handler)(uint8_t))
+void IRQH_Int(uint8_t irq, uint32_t (*handler)(uint8_t))
 {
 	int i;
 	IRQH_IRQ[irq&7] = 1;
@@ -82,8 +82,8 @@ void IRQH_Int(uint8_t irq, DWORD (*handler)(uint8_t))
 signed int my_irqh_callback(signed int  level)
 {
 	int i;
-	DWORD (*func)(uint8_t) = IRQH_CallBack[level&7] ? IRQH_CallBack[level&7] : &IRQH_DefaultVector;
-	DWORD vect = (*func)(level&7);
+	uint32_t (*func)(uint8_t) = IRQH_CallBack[level&7] ? IRQH_CallBack[level&7] : &IRQH_DefaultVector;
+	uint32_t vect = (*func)(level&7);
 
 	for (i=7; i>0; i--)
 	{
@@ -100,7 +100,7 @@ signed int my_irqh_callback(signed int  level)
 		}
 	}
 
-	if (vect > (((DWORD)-1) / 2)) {
+	if (vect > (((uint32_t)-1) / 2)) {
 		/* XXX: C68K expects a signed int type, so do (close enough to)
 		 * the right thing here to avoid any potential signed integer
 		 * overflow.  The better alternative would be to change

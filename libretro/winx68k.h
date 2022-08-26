@@ -28,9 +28,9 @@ extern int rfd_sock;
 
 extern	uint8_t*	FONT;
 
-extern	WORD	VLINE_TOTAL;
-extern	DWORD	VLINE;
-extern	DWORD	vline;
+extern	uint16_t	VLINE_TOTAL;
+extern	uint32_t	VLINE;
+extern	uint32_t	vline;
 
 extern	char	winx68k_dir[MAX_PATH];
 extern	char	winx68k_ini[MAX_PATH];

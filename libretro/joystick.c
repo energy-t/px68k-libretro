@@ -77,15 +77,15 @@ void FASTCALL Joystick_Write(uint8_t num, uint8_t data)
 #define DELAY 30      /* delay before 1st repeat */
 uint8_t keyb_in, joy_in;
 
-static DWORD get_px68k_input_bitmasks(int port)
+static uint32_t get_px68k_input_bitmasks(int port)
 {
    return input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
 }
 
-static WORD get_px68k_input(int port)
+static uint16_t get_px68k_input(int port)
 {
-   DWORD i = 0;
-   DWORD res = 0;
+   uint32_t i = 0;
+   uint32_t res = 0;
    for (i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R + 1); i++)
       res |= input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
    return res;
@@ -101,7 +101,7 @@ void FASTCALL Joystick_Update(int is_menu, int key, int port)
 	uint8_t mret0 = 0xff, mret1 = 0xff;
 	uint8_t temp = 0;
 	static uint8_t pre_ret0 = 0xff, pre_mret0 = 0xff;
-	DWORD res = 0;
+	uint32_t res = 0;
 
 	if (libretro_supports_input_bitmasks)
 		res = get_px68k_input_bitmasks(port);

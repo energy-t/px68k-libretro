@@ -4,13 +4,13 @@
 #include <stdint.h>
 
 extern int winx, winy;
-extern WORD WinDraw_Pal16B, WinDraw_Pal16R, WinDraw_Pal16G;
+extern uint16_t WinDraw_Pal16B, WinDraw_Pal16R, WinDraw_Pal16G;
 
 extern	int	WindowX;
 extern	int	WindowY;
 extern	int	kbd_x, kbd_y, kbd_w, kbd_h;
 
-void WinDraw_InitWindowSize(WORD width, WORD height);
+void WinDraw_InitWindowSize(uint16_t width, uint16_t height);
 int WinDraw_Init(void);
 void WinDraw_Cleanup(void);
 void FASTCALL WinDraw_Draw(void);

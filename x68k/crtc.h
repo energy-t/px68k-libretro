@@ -31,10 +31,10 @@ void CRTC_Init(void);
 
 void CRTC_RasterCopy(void);
 
-uint8_t FASTCALL CRTC_Read(DWORD adr);
-void FASTCALL CRTC_Write(DWORD adr, uint8_t data);
+uint8_t FASTCALL CRTC_Read(uint32_t adr);
+void FASTCALL CRTC_Write(uint32_t adr, uint8_t data);
 
-uint8_t FASTCALL VCtrl_Read(DWORD adr);
-void FASTCALL VCtrl_Write(DWORD adr, uint8_t data);
+uint8_t FASTCALL VCtrl_Read(uint32_t adr);
+void FASTCALL VCtrl_Write(uint32_t adr, uint8_t data);
 
 #endif /* _WINX68K_CRTC_H */

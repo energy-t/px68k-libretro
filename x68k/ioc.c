@@ -14,14 +14,14 @@ void IOC_Init(void)
 	IOC_IntVect = 0;
 }
 
-uint8_t FASTCALL IOC_Read(DWORD adr)
+uint8_t FASTCALL IOC_Read(uint32_t adr)
 {
 	if (adr==0xe9c001)
 		return IOC_IntStat;
 	return 0xff;
 }
 
-void FASTCALL IOC_Write(DWORD adr, uint8_t data)
+void FASTCALL IOC_Write(uint32_t adr, uint8_t data)
 {
 	if (adr==0xe9c001)
 	{

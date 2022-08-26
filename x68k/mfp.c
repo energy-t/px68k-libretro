@@ -20,13 +20,13 @@ static const int Timer_Prescaler[8] = {1, 10, 25, 40, 125, 160, 250, 500};
 /*
  *   優先割り込みのチェックをし、該当ベクタを返す
  */
-DWORD FASTCALL MFP_IntCallback(uint8_t irq)
+uint32_t FASTCALL MFP_IntCallback(uint8_t irq)
 {
 	uint8_t flag;
-	DWORD vect;
+	uint32_t vect;
 	int offset = 0;
 	IRQH_IRQCallBack(irq);
-	if (irq!=6) return (DWORD)-1;
+	if (irq!=6) return (uint32_t)-1;
 	for (flag=0x80, vect=15; flag; flag>>=1, vect--)
 	{
 		if ((MFP[MFP_IPRA]&flag)&&(MFP[MFP_IMRA]&flag)&&(!(MFP[MFP_ISRA]&flag)))
@@ -44,7 +44,7 @@ DWORD FASTCALL MFP_IntCallback(uint8_t irq)
 	if (!flag)
 	{
 		Error("MFP Int w/o Request. Default Vector(-1) has been returned.");
-		return (DWORD)-1;
+		return (uint32_t)-1;
 	}
 
 	MFP[MFP_IPRA+offset] &= (~flag);
@@ -142,7 +142,7 @@ void MFP_Init(void)
 /*
  *   I/O Read
  */
-uint8_t FASTCALL MFP_Read(DWORD adr)
+uint8_t FASTCALL MFP_Read(uint32_t adr)
 {
 	uint8_t reg;
 	uint8_t ret = 0;
@@ -191,7 +191,7 @@ uint8_t FASTCALL MFP_Read(DWORD adr)
 /*
  *   I/O Write
  */
-void FASTCALL MFP_Write(DWORD adr, uint8_t data)
+void FASTCALL MFP_Write(uint32_t adr, uint8_t data)
 {
 	uint8_t reg;
 	if (adr>0xe8802f) return;
